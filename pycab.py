@@ -621,10 +621,22 @@ if __name__ == '__main__':
     names, values = zip_sort(names, values)
     plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO2')
 
+    element_rename_dict = {
+        'ExternalSlab': 'Substructure',
+        'ExternalWall': 'External Walls',
+        'Slab': 'Upper Floors',
+        'Wall': 'Internal Walls',
+        'ExternalRoof': 'Roof',
+        'ExternalDoor': 'External Doors',
+        'Window': 'Windows',
+        'Stair': 'Stairs',
+        'Door': 'Internal Doors'
+    }
     names = list(element_counts.keys())
     values = list(element_counts[name] for name in names)
-    names, values = zip_sort(names, values)
-    plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), names, values, 'Total kgCO2')
+    new_names = [element_rename_dict[n] for n in names]
+    new_names, values = zip_sort(new_names, values)
+    plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO2')
 
     replacement_dict = {}
     replacement_dict.update(building_properties)
