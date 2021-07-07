@@ -19,14 +19,19 @@ def plot_barchart(filename, names, values, yaxis):
     #sns.set()
     #sns.set_palette('pastel')
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(7.5, 6),  constrained_layout=True)
 
     plt.ylabel(yaxis)
     plt.xticks(rotation=90)
     # plt.xlabel
-    ax.text(0.93, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=14)
-    plt.bar(names, values)
-    fig.tight_layout()
+    ax.text(0.95, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=12, color='grey')
+    plt.bar(names, values, color='#4C7998')
+
+    #fig.tight_layout()
+    # Hide the right and top spines
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+
     plt.savefig(filename + '.svg')
 
 
@@ -37,19 +42,19 @@ def plot_benchmark(filename, benchmark_value):
 
     # Choose some nice levels
     levels = [-3, -2, -2, -3, -2, -2, -3, 3, 2, 3, 2, 3]
-    colors = ['r','r','r','r','r','r','r','b','b','b','b','b']
+    colors = ['#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD',
+              '#C5E0B4','#C5E0B4','#C5E0B4','#C5E0B4','#C5E0B4']
 
     # Create figure and plot a stem plot with the date
-    fig, ax = plt.subplots(figsize=(8, 4), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(7.5, 4), constrained_layout=True)
 
     ax.invert_xaxis()
     ax.vlines(vals, 0, levels, colors=colors)  # The vertical stems.
     ax.plot(vals, np.zeros_like(vals), "-o", color="k", markerfacecolor="w")  # Baseline and markers on it.
 
     ax.plot(benchmark_value, np.zeros_like(benchmark_value), "o", color="black", markerfacecolor="w", markersize=10, fillstyle='full')
-    ax.plot(benchmark_value, np.zeros_like(benchmark_value), "o", color="green", markerfacecolor="g", markersize=5, fillstyle='full')
-    ax.vlines(benchmark_value, 0, [2], colors='green')
-
+    ax.plot(benchmark_value, np.zeros_like(benchmark_value), "o", color="#4C7998", markerfacecolor="#4C7998", markersize=5, fillstyle='full')
+    ax.vlines(benchmark_value, 0, [2], colors='#4C7998')
 
     # annotate lines
     for d, l, r in zip(vals+[benchmark_value], levels + [2], names +['Building EC (' + str(round(benchmark_value)) + ')']):
@@ -62,9 +67,8 @@ def plot_benchmark(filename, benchmark_value):
     #ax.xaxis.set_major_locator(mdates.MonthLocator(interval=4))
     #ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
-    ax.text(0.93, 0.05, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=14)
+    ax.text(0.95, 0.05, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=12, color='grey')
     plt.xlabel('Embodied Carbon (kgCO₂/m²)')
-
 
     # remove y axis and spines
     ax.yaxis.set_visible(False)
