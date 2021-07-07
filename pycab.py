@@ -16,8 +16,8 @@ import ifcopenshell
 
 def plot_barchart(filename, names, values, yaxis):
     # Plot
-    sns.set()
-    sns.set_palette('pastel')
+    #sns.set()
+    #sns.set_palette('pastel')
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -27,7 +27,7 @@ def plot_barchart(filename, names, values, yaxis):
     ax.text(0.93, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=14)
     plt.bar(names, values)
     fig.tight_layout()
-    plt.savefig(filename + '.png')
+    plt.savefig(filename + '.svg')
 
 
 def plot_benchmark(filename, benchmark_value):
@@ -63,7 +63,7 @@ def plot_benchmark(filename, benchmark_value):
     #ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     plt.setp(ax.get_xticklabels(), rotation=30, ha="right")
     ax.text(0.93, 0.05, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=14)
-    plt.xlabel('Embodied Carbon (kgCO2/m2)')
+    plt.xlabel('Embodied Carbon (kgCO₂/m²)')
 
 
     # remove y axis and spines
@@ -72,7 +72,7 @@ def plot_benchmark(filename, benchmark_value):
 
     ax.margins(y=0.1)
     #plt.show()
-    plt.savefig(filename + '.png')
+    plt.savefig(filename + '.svg')
 
 #
 # Misc
@@ -619,7 +619,7 @@ if __name__ == '__main__':
     names = list(material_counts.keys())
     values = list(material_counts[name] for name in names)
     names, values = zip_sort(names, values)
-    plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO2')
+    plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO₂')
 
     element_rename_dict = {
         'ExternalSlab': 'Substructure',
@@ -636,7 +636,7 @@ if __name__ == '__main__':
     values = list(element_counts[name] for name in names)
     new_names = [element_rename_dict[n] for n in names]
     new_names, values = zip_sort(new_names, values)
-    plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO2')
+    plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO₂')
 
     replacement_dict = {}
     replacement_dict.update(building_properties)

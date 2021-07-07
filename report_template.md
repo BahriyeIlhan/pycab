@@ -15,17 +15,17 @@ Below is a summary of the embodied carbon in your project.
 | ------------------------------ | ----------------------------------------- |
 | **Building Internal Area**     | %(BuildingAreaInternal)20.2f m²           |
 | **Total Embodied Carbon**      | %(BuildingEC)20.2f                        |
-| **Total Embodied Carbon/m²**   | %(BuildingECPerAreaInternal)20.2f kgCO2/m²|
+| **Total Embodied Carbon/m²**   | %(BuildingECPerAreaInternal)20.2f kgCO₂/m²|
 
 ### Benchmark
 
-![Benchmark Plot](benchmark.png)
+![Benchmark Plot](benchmark.svg)
 
 ### Elements
 
-![Element Plot](element_counts.png)
+![Element Plot](element_counts.svg)
 
 ### Materials
 
-![Material Plot](material_counts.png)
+![Material Plot](material_counts.svg)
 
