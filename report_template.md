@@ -1,9 +1,9 @@
-# Embodied Carbon Report (`%(IFCFilename)s.ifc`)
+# Embodied Carbon Report
 
-Below is a summary of the embodied carbon in your project.
+**pyCAB Version**: %(GitID)s  
+**Report Generation Date**: %(Date)s  
 
-## Project Summary
-
+**Project Filename**: %(IFCFilename)s.ifc  
 **Building Name**: %(BuildingID)s  
 **Year of Construction**: %(YearOfConstruction)s  
 **Location**: %(Location)s  
@@ -13,14 +13,16 @@ Below is a summary of the embodied carbon in your project.
 
 | Description                       | Value                                     |
 | :-----------------------------    | :---------------------------------------- |
-| **Internal Building Area**        | %(BuildingAreaInternal)20.2f m²           |
-| **Total Embodied Carbon** [A1-A3] | %(BuildingEC)20.2f kgCO₂                  |
-| **Total Embodied Carbon/m²**      | %(BuildingECPerAreaInternal)20.2f kgCO₂/m²|
+| Internal Building Area            | %(BuildingAreaInternal)20.2f m²           |
+| Total Embodied Carbon     [A1-A3] | %(BuildingEC)20.2f kgCO₂                  |
+| Total Embodied Carbon/m²          | %(BuildingECPerAreaInternal)20.2f kgCO₂/m²|
+| Potential Embodied Carbon [A1-A3] | %(BuildingPotentialEC)20.2f kgCO₂                  |
 
-### Benchmark 
-[based on RIBA 2030 Climate Challenge Target Benchmarks Review]
+### Benchmark [¹][riba2030]
 
 ![Benchmark Plot](benchmark.svg)
+
+## Embodied Carbon Analysis
 
 ### Embodied Carbon by Building Elements
 
@@ -30,3 +32,9 @@ Below is a summary of the embodied carbon in your project.
 
 ![Material Plot](material_counts.svg)
 
+### Replacement Suggestions
+
+%(ECReplacements)s
+
+
+[riba2030]:  https://www.architecture.com/about/policy/climate-action/2030-climate-challenge/resources "RIBA 2030 Climate Challenge Target Benchmarks Review"

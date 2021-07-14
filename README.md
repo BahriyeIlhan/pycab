@@ -11,7 +11,8 @@ Prerequisites:
 * [matplotlib](https://matplotlib.org/)
 * [numpy](https://numpy.org/)
 * [seaborn](https://seaborn.pydata.org/)
-
+* [pandas](https://pandas.pydata.org/)
+* [tabulate](https://pypi.org/project/tabulate/)
 
 pycab is a simple script, no installation is necessary.
 

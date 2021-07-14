@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import os
 import shutil
+import datetime
+from subprocess import check_output as shell_call, CalledProcessError, STDOUT
 
+import pandas as pd
 import numpy as np
 import markdown
 import matplotlib.pyplot as plt
@@ -14,7 +17,7 @@ import ifcopenshell
 # Plotting
 #
 
-def plot_barchart(filename, names, values, yaxis):
+def plot_barchart(filename, names, values, yaxis, values2 = None):
     # Plot
     #sns.set()
     #sns.set_palette('pastel')
@@ -26,6 +29,8 @@ def plot_barchart(filename, names, values, yaxis):
     # plt.xlabel
     ax.text(0.95, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=12, color='grey')
     plt.bar(names, values, color='#4C7998')
+    if values2:
+        plt.bar(names, values2, color='#C5E0B4')
 
     #fig.tight_layout()
     # Hide the right and top spines
@@ -81,6 +86,19 @@ def plot_benchmark(filename, benchmark_value):
 #
 # Misc
 #
+
+def get_git_id():
+    # get git commit id and write into header file
+    try:
+        git_id = shell_call(['git', 'rev-parse', 'HEAD'], cwd=os.path.split(os.path.abspath(__file__))[0],
+                            stderr=STDOUT).strip()
+    except CalledProcessError:
+        git_id = 'UNKNOWN'
+    # in python3, the return type of `shell_call` may be `bytes` but we need `str`
+    if not isinstance(git_id, str):
+        git_id = git_id.decode()
+    return git_id
+
 
 def zip_sort(list1, list2):
     zipped_lists = zip(list2, list1)
@@ -183,6 +201,12 @@ def generate_report(ifc_filename, replacement_dict):
 #
 # Parsing
 #
+
+def parse_ec_code(ec_code):
+    ec, ec_class, ec_id = ec_code.split('-')
+    assert ec == 'EC'
+    return (ec_class, ec_id)
+
 
 def dump(element):
     print('---------- begin dump ----------')
@@ -568,19 +592,19 @@ if __name__ == '__main__':
     #print(element_counts)
 
     # Total Carbon
-    total_carbon = 0
-    for val in element_counts.values():
-        total_carbon += val['Carbon']
-    print('total_carbon', total_carbon, 'kgC02')
+    #total_carbon = 0
+    #for val in element_counts.values():
+    #    total_carbon += val['Carbon']
+    #print('total_carbon', total_carbon, 'kgC02')
 
     # Total Floor space
     #print(element_dict)
-    total_area = 0
-    for key, value in element_dict['Slab'].items():
-        total_area += value['Area']
-    print('total_area', total_area, 'm2')
+    #total_area = 0
+    #for key, value in element_dict['Slab'].items():
+    #    total_area += value['Area']
+    #print('total_area', total_area, 'm2')
 
-    print('total_carbon/total_area', total_carbon / total_area, 'kgCO2/m2')
+    #print('total_carbon/total_area', total_carbon / total_area, 'kgCO2/m2')
 
     # Parse Elements
     #names = list(element_counts.keys())
@@ -599,14 +623,14 @@ if __name__ == '__main__':
         for sub_key, sub_val in element_val.items():
             for material_key, material_value in sub_val['Layers'].items():
                 if material_key in material_counts:
-                    material_counts[material_key] += material_value
+                    material_counts[material_key.strip().title()] += material_value
                 else:
-                    material_counts[material_key] = material_value
+                    material_counts[material_key.strip().title()] = material_value
 
                 if sub_val['IsExternal']:
-                    element_key_name = 'External' + element_key.strip()
+                    element_key_name = 'External' + element_key.strip().title()
                 else:
-                    element_key_name = element_key.strip()
+                    element_key_name = element_key.strip().title()
                 if element_key_name in element_counts:
                     element_counts[element_key_name] += material_value
                 else:
@@ -617,14 +641,73 @@ if __name__ == '__main__':
     building_properties['BuildingECPerAreaInternal'] = building_ec/building_area_internal
     building_properties['IFCFilename'] = ifc_filename
 
-    # Plot
+    print('Processing Replacements...')
+    cmp_tol = 1e-5 # Tolerance when comparing floats
+    ec_dataframe = pd.read_csv('EC_MaterialsDB.csv',sep=';')
+    ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: x.strip().title())
+
+    # Parse EC Code
+    ec_dataframe['EC_Class'] = ec_dataframe['ID'].apply(lambda x: x.split('-')[1])
+    ec_dataframe['EC_ID'] = ec_dataframe['ID'].apply(lambda x: x.split('-')[2])
+
+    # Compute EC Per Volume
+    ec_dataframe['EC_Per_Volume'] = ec_dataframe['EmbodiedCarbon(kgCO2e/kg)'].apply(lambda x: float(str(x).replace(',','.'))) * \
+                                    ec_dataframe['Density'].apply(lambda x: float(str(x).replace(',','.')))
+
+    ec_replacements_dict = {}
+    min_ec_dict = {}
+    for material in material_counts.keys():
+        min_ec_dict[material.strip().title()] = 0.
+        material_dataframe =  ec_dataframe.loc[ec_dataframe['Name'] == material.strip().title()]
+        if len(material_dataframe) > 1:
+            raise LookupError('Found more than one entry in database for: ' + material.strip().title() )
+        elif len(material_dataframe) == 1:
+            #print(material_dataframe)
+            # Attempt to find replacement material
+            #print('EC_Class', material_dataframe.squeeze().at['EC_Class'])
+            class_dataframe = ec_dataframe.loc[ec_dataframe['EC_Class'] == material_dataframe.squeeze().at['EC_Class']]
+            if class_dataframe.EC_Per_Volume.min() < material_dataframe.squeeze().at['EC_Per_Volume'] - cmp_tol:
+                min_ec_dict[material.strip().title()] = class_dataframe.EC_Per_Volume.min()
+                possible_replacements = class_dataframe[class_dataframe.EC_Per_Volume == class_dataframe.EC_Per_Volume.min()]
+                if len(possible_replacements) > 0:
+                    ec_replacements_dict[material_dataframe.squeeze().at['Name']] = pd.concat([
+                            material_dataframe[['ID','Name','EC_Per_Volume']],
+                            possible_replacements[['ID','Name','EC_Per_Volume']]
+                        ])
+
+    # Plot 1
     plot_benchmark(os.path.join('reports',ifc_filename,'benchmark'), building_ec/building_area_internal)
 
+    # Plot 2
     names = list(material_counts.keys())
-    values = list(material_counts[name] for name in names)
+    values = [material_counts[name] for name in names]
     names, values = zip_sort(names, values)
-    plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO₂')
+    #for name in names:
+    #    print(name)
+    #    print(ec_dataframe.loc[ec_dataframe['Name'] == name.strip().title()].squeeze() == None)
+    plot_min_values = []
+    true_min_values_dict = {}
+    for name, value in zip(names, values):
+        if not ec_dataframe.loc[ec_dataframe['Name'] == name.strip().title()].squeeze().empty:
+            new_ec = value * min_ec_dict[name] / float(ec_dataframe.loc[ec_dataframe['Name'] == name].squeeze().at['EC_Per_Volume'])
+            plot_min_values.append(new_ec)
+            true_min_values_dict[name] = new_ec
+        else:
+            plot_min_values.append(material_counts[name])
+            true_min_values_dict[name] = material_counts[name]
+    plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO₂', plot_min_values)
 
+    # Replacement Tables
+    ec_replacements_str = []
+    i = 1
+    for name in names:
+        if name in ec_replacements_dict:
+            ec_replacements_str.append('\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#C5E0B4">%.0f kgCO₂</span>  \n' % (i, name, material_counts[name], true_min_values_dict[name]) )
+            ec_replacements_str.append(ec_replacements_dict[name].to_markdown(index=False))
+            i = i+1
+    ec_replacements_str = '\n'.join(ec_replacements_str)
+
+    # Plot 3
     element_rename_dict = {
         'ExternalSlab': 'Substructure',
         'ExternalWall': 'External Walls',
@@ -643,6 +726,10 @@ if __name__ == '__main__':
     plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO₂')
 
     replacement_dict = {}
+    replacement_dict['Date'] = datetime.date.today().strftime("%d/%m/%Y")
+    replacement_dict['GitID'] = get_git_id()[:7]
+    replacement_dict['ECReplacements'] = ec_replacements_str
+    replacement_dict['BuildingPotentialEC'] = sum(true_min_values_dict.values())
     replacement_dict.update(building_properties)
 
     generate_report(ifc_filename, replacement_dict)
