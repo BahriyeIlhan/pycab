@@ -368,7 +368,7 @@ def get_building_properties(building):
 if __name__ == '__main__':
     # Workflow from https://thinkmoult.com/using-ifcopenshell-parse-ifc-files-python.html
 
-    ifc_filename = 'EC_Project_HX'
+    ifc_filename = 'EC_Project_SR'
 
     # Generate report directory
     os.makedirs(os.path.join('reports',ifc_filename), exist_ok=True)
@@ -643,11 +643,12 @@ if __name__ == '__main__':
     print('Processing Replacements...')
     cmp_tol = 1e-5 # Tolerance when comparing floats
     ec_dataframe = pd.read_csv('EC_MaterialsDB.csv',sep=';')
-    ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: x.strip().title())
+    ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: str(x).strip().title())
 
     # Parse EC Code
-    ec_dataframe['EC_Class'] = ec_dataframe['ID'].apply(lambda x: x.split('-')[1])
-    ec_dataframe['EC_ID'] = ec_dataframe['ID'].apply(lambda x: x.split('-')[2])
+    print(ec_dataframe)
+    ec_dataframe['EC_Class'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[1])
+    ec_dataframe['EC_ID'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[2])
 
     # Compute EC Per Volume
     ec_dataframe['EC_Per_Volume'] = ec_dataframe['EmbodiedCarbon(kgCO2e/kg)'].apply(lambda x: float(str(x).replace(',','.'))) * \
@@ -702,7 +703,7 @@ if __name__ == '__main__':
     for name in names:
         if name in ec_replacements_dict:
             ec_replacements_str.append(
-                '\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#C5E0B4">%.0f kgCO₂</span>  \n' % (
+                '\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#9BCA7E">%.0f kgCO₂</span>  \n' % (
                 i, name, material_counts[name], true_min_values_dict[name]))
             ec_replacements_str.append(ec_replacements_dict[name].to_markdown(index=False))
             i = i + 1

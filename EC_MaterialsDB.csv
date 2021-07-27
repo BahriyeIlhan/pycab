@@ -1,51 +1,57 @@
-ID;Name;Description;EmbodiedCarbon(kgCO2e/kg);Density
-EC-01-01;AggregateSand, General UK;Aggregates and sand, general UK, mixture of land won, marine, secondary and recycled, bulk, loose;0,007;2240
-EC-01-02;AggregateSand, General ;Aggregates and sand, general, virgin mixture of land won and marine, bulk, loose;0,005;2240
-EC-01-03;AggregateSand, Virgin Land ;Aggregates and sand, from virgin land won resources, bulk, loose;0,004;2240
-EC-01-04;AggregateSand, Virgin Marine ;Aggregates and sand, from virgin marine resources, bulk, loose;0,009;2240
-EC-01-05;AggregateSand, Recycled No Heat ;Aggregates and sand, from recycled resources, no heat treatment, bulk, loose;0,006;2240
-EC-01-06;AggregateSand, Recycled With Heat ;Aggregates and sand, from recycled resources, with heat treatment, bulk, loose;0,119;2240
-EC-01-07;AggregateSand, Clay;Aggregates and sand, expanded clay, bulk, loose;0,393;2240
-EC-01-08;AggregateSand, Foamed Glass ;Aggregates and sand, expanded foamed glass, bulk, loose;0,278;2240
-EC-01-09;AggregateSand, Secondary ;Aggregates and sand, from secondary resources, bulk, loose;0,063;2240
-EC-01-10;AggregateSand, Recycled and Secondary ;Aggregates and sand, mixture of recycled and secondary resources, bulk, loose;0,014;2240
-EC-02-01;Aluminium, Europe;Aluminium, produced in Europe;5,580;2700
-EC-02-02;Aluminium General, European;Aluminium General, European Mix, Inc Imports;6,670;2700
-EC-02-03;Aluminium sheet, European;Aluminium sheet, European Mix, Inc Imports;6,580;2700
-EC-02-04;Aluminium foil, European;Aluminium foil, European Mix, Inc Imports;7,470;2700
-EC-02-05;Aluminium extruded profile, European;Aluminium extruded profile, European Mix, Inc Imports;6,830;2700
-EC-02-06;Aluminium cast, European;Aluminium cast, European Mix, Inc Imports;6,720;2700
-EC-03-01;Clay, Brick;;0,213;1700
-EC-04-01;Concrete RC 25/30;Assumed 305 kg cementitious content per m3 concrete. Possible uses: reinforced foundations;0,129;2300
-EC-04-02;Concrete RC 28/35;Assumed 325 kg cementitious content per m3 concrete. Possible uses: reinforced foundations, ground floors;0,136;2300
-EC-04-03;Lean Concrete 25/30 Mpa;Assumed 305 kg cementitious content per m3 concrete;0,119;2200
-EC-04-04;Precast Concrete Slab;;0,132;2300
-EC-04-05;Concrete Block;Concrete block, high density solid, average strength, per kg;0,093;1760
-EC-04-06;AAC Concrete Block;;0,280;750
-EC-05-01;Insulation, Cork ;;0,190;160
-EC-05-02;Insulation, Fibreglass (Glasswool) ;;1,350;24
-EC-05-03;Insulation, Mineral wool ;;1,280;140
-EC-05-04;Insulation, Rockwool ;;1,120;100
-EC-05-05;Insulation, Expanded Polystyrene;;3,290;24
-EC-06-01;Plasterboard;;0,390;800
-EC-06-02;Plaster Skim Finish ;Including double coat paint;0,870;1430
-EC-06-03;Bitumen Emulsion;;0,296;2400
-EC-07-01;Membrane, Roof ;High Density Polyethylene (HDPE) Resin ;1,930;1380
-EC-07-02;LDPE Film, Foundation;;2,600;1200
-EC-08-01;Stone, Sandstone;;0,060;2200
-EC-08-02;Stone, Limestone;;0,090;2750
-EC-08-03;Stone, Slate;;0,035;2750
-EC-08-04;Slate Shingle, Roof ;;0,035;2750
-EC-09-01;Ceramic Tile, Floor;Terrazzo Tiles;0,118;2000
-EC-09-02;Ceramic Tile, Wall;Terrazzo Tiles;0,118;2000
-EC-10-01;Timber, Roof;Softwood;0,263;510
-EC-10-02;Timber, Door;Hardwood;0,306;650
-EC-10-03;Timber, Floor (Parquet);;0,811;720
-EC-10-04;Timber, Glulam;;0,512;720
-EC-11-01;Glass, Glazing, Double;Glass, Glazing, Double, per kg. 2.5kg glass per mm thickness, per m2;1,630;2500
-EC-11-02;Glass, Glazing, Triple;Glass, Glazing, Triple, per kg. 2.5kg glass per mm thickness, per m2;1,750;2500
-EC-11-03;Glass, Toughened;Glass, Toughened, per kg. 2.5kg glass per mm thickness, per m2;1,670;2500
-EC-11-04;Glass Multi layer safety;Glass Multi layer safety, filled core, fire resistant, toughened, per kg. 2.5kg glass per mm thickness, per m2;2,080;2500
-EC-11-05;Glass, sky light or roof, with frame;Glass, sky light or roof, with frame, per kg. 2.5kg glass per mm thickness, per m2;3,100;2500
-EC-12-01;Steel, Finished cold-rolled coil;;2,730;8000
-EC-12-02;Steel, Structural;Hot-dip galvanized steel;2,760;7800
+ID;Name;Description;EmbodiedCarbon(kgCO2e/kg);Density;ECxDensity
+EC-01-01;AggregateSand, General UK;Aggregates and sand, general UK, mixture of land won, marine, secondary and recycled, bulk, loose;0,007;2240;17
+EC-01-02;AggregateSand, General ;Aggregates and sand, general, virgin mixture of land won and marine, bulk, loose;0,005;2240;11
+EC-01-03;AggregateSand, Virgin Land ;Aggregates and sand, from virgin land won resources, bulk, loose;0,004;2240;10
+EC-01-04;AggregateSand, Virgin Marine ;Aggregates and sand, from virgin marine resources, bulk, loose;0,009;2240;20
+EC-01-05;AggregateSand, Recycled No Heat ;Aggregates and sand, from recycled resources, no heat treatment, bulk, loose;0,006;2240;14
+EC-01-06;AggregateSand, Recycled With Heat ;Aggregates and sand, from recycled resources, with heat treatment, bulk, loose;0,119;2240;267
+EC-01-07;AggregateSand, Clay;Aggregates and sand, expanded clay, bulk, loose;0,393;2240;881
+EC-01-08;AggregateSand, Foamed Glass ;Aggregates and sand, expanded foamed glass, bulk, loose;0,278;2240;622
+EC-01-09;AggregateSand, Secondary ;Aggregates and sand, from secondary resources, bulk, loose;0,063;2240;142
+EC-01-10;AggregateSand, Recycled and Secondary ;Aggregates and sand, mixture of recycled and secondary resources, bulk, loose;0,014;2240;32
+EC-02-01;Aluminium, Europe;Aluminium, produced in Europe;5,58;2700;15066
+EC-02-02;Aluminium General, European;Aluminium General, European Mix, Inc Imports;6,67;2700;18009
+EC-02-03;Aluminium sheet, European;Aluminium sheet, European Mix, Inc Imports;6,58;2700;17766
+EC-02-04;Aluminium foil, European;Aluminium foil, European Mix, Inc Imports;7,47;2700;20169
+EC-02-05;Aluminium extruded profile, European;Aluminium extruded profile, European Mix, Inc Imports;6,83;2700;18441
+EC-02-06;Aluminium cast, European;Aluminium cast, European Mix, Inc Imports;6,72;2700;18144
+EC-03-01;Clay, Brick;;0,213;1700;362
+EC-04-01;RC 25/30 (CEM I);Assumed 305 kg cementitious content per m3 concrete. Possible uses: reinforced foundations;0,129;2300;297
+EC-04-02;RC 25/30 (Portland Limestone);Assumed 300 kg cementitious content per m3 concrete. ;0,111;2300;255
+EC-04-03;RC 25/30 (Pozzolanic Ash);Assumed 315 kg cementitious content per m3 concrete.;0,1;2300;230
+EC-05-01;Insulation, Cork ;;0,19;160;30
+EC-05-02;Insulation, Fibreglass (Glasswool) ;;1,35;24;32
+EC-05-03;Insulation, Mineral wool ;;1,28;140;179
+EC-05-04;Insulation, Rockwool ;;1,12;23;26
+EC-05-05;Insulation, Expanded Polystyrene;;3,29;24;79
+EC-06-01;Plasterboard;;0,39;800;312
+EC-06-02;Timber, Panel;;0,345;550;190
+EC-07-01;Membrane, Roof ;High Density Polyethylene (HDPE) Resin ;1,93;1380;2663
+EC-08-01;Stone, Sandstone;;0,06;2200;132
+EC-08-02;Stone, Limestone;;0,09;2750;248
+EC-08-03;Stone, Slate;;0,035;2750;96
+EC-09-01;Ceramic Tile, Terrazzo;Terrazzo Tiles;0,118;2000;236
+EC-10-01;Timber, Roof;Softwood;0,263;510;134
+EC-11-01;Glass, Glazing, Double;Glass, Glazing, Double, per kg. 2.5kg glass per mm thickness, per m2;1,63;2500;4075
+EC-11-02;Glass, Glazing, Triple;Glass, Glazing, Triple, per kg. 2.5kg glass per mm thickness, per m2;1,75;2500;4375
+EC-11-03;Glass, Toughened;Glass, Toughened, per kg. 2.5kg glass per mm thickness, per m2;1,67;2500;4175
+EC-11-04;Glass Multi layer safety;Glass Multi layer safety, filled core, fire resistant, toughened, per kg. 2.5kg glass per mm thickness, per m2;2,08;2500;5200
+EC-11-05;Glass, sky light or roof, with frame;Glass, sky light or roof, with frame, per kg. 2.5kg glass per mm thickness, per m2;3,1;2500;7750
+EC-12-01;Steel, Finished cold-rolled coil;;2,73;8000;21840
+EC-13-01;RC 28/35 (CEM I);Assumed 325 kg cementitious content per m3 concrete. Possible uses: reinforced foundations, ground floors;0,136;2300;313
+EC-13-02;RC 28/35 (Portland Limestone);Assumed 320 kg cementitious content per m3 concrete;0,117;2300;269
+EC-13-03;RC 28/35 (Pozzolanic Ash);Assumed 375 kg cementitious content per m3 concrete;0,106;2300;244
+EC-14-01;Concrete Block;Concrete block, high density solid, average strength, per kg;0,093;1760;164
+EC-14-02;AAC Concrete Block;;0,28;750;210
+EC-15-01;Precast Concrete;;0,132;2300;304
+EC-16-01;Lean Concrete 25/30 MPa;Assumed 305 kg cementitious content per m3 concrete;0,119;2200;262
+EC-17-01;Bitumen Emulsion;;0,296;2400;710
+EC-18-01;Plaster Skim Finish ;Including double coat paint;0,87;1430;1244
+EC-19-01;Slate Shingle, Roof ;;0,035;2750;96
+EC-20-01;LDPE Film, Foundation;;2,6;1200;3120
+EC-21-01;Steel, Structural;Hot-dip galvanized steel;2,76;7800;21528
+EC-22-01;Timber, Door;Hardwood;0,306;650;199
+EC-23-01;Timber, Floor (Oak);;0,811;720;584
+EC-24-01;Timber, Glulam;;0,512;720;369
+EC-25-01;External Door Composite;Garage Door, Aluminium;5,58;2700;15066
+EC-25-02;External Door Composite;Garage Door, Wood-Plastic Composite;1,44;1000;1440
