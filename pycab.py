@@ -26,10 +26,12 @@ def plot_barchart(filename, names, values, yaxis, values2 = None):
     plt.ylabel(yaxis)
     plt.xticks(rotation=90)
     # plt.xlabel
-    ax.text(0.95, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=12, color='grey')
-    plt.bar(names, values, color='#4C7998')
+    plt.bar(names, values, color='#4C7998', label='Current')
     if values2:
-        plt.bar(names, values2, color='#C5E0B4')
+        plt.bar(names, values2, color='#C5E0B4', label='Suggested')
+
+    ax.text(0.95, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=12, color='grey')
+    plt.legend(loc='upper right', bbox_to_anchor=(1., 0.9))
 
     #fig.tight_layout()
     # Hide the right and top spines
@@ -39,7 +41,7 @@ def plot_barchart(filename, names, values, yaxis, values2 = None):
     plt.savefig(filename + '.svg')
 
 
-def plot_benchmark(filename, benchmark_value):
+def plot_benchmark(filename, benchmark_value, suggested_benchmark_value):
     #Plot
     names = ['Current (Max)','','','Current (Avg)','','','Current (Min)','2030 (Max)','','2030 (Avg)','','2030 (Min)']
     vals = [367.50, 338.10, 289.80, 275.10, 231.00, 215.25, 210.00, 178.50, 157.50, 110.25, 63.00, 42.00]
@@ -60,8 +62,15 @@ def plot_benchmark(filename, benchmark_value):
     ax.plot(benchmark_value, np.zeros_like(benchmark_value), "o", color="#4C7998", markerfacecolor="#4C7998", markersize=5, fillstyle='full')
     ax.vlines(benchmark_value, 0, [2], colors='#4C7998')
 
+    ax.plot(suggested_benchmark_value, np.zeros_like(suggested_benchmark_value), "o", color="black", markerfacecolor="w", markersize=10, fillstyle='full')
+    ax.plot(suggested_benchmark_value, np.zeros_like(suggested_benchmark_value), "o", color="#9BCA7E", markerfacecolor="#9BCA7E", markersize=5, fillstyle='full')
+    ax.vlines(suggested_benchmark_value, 0, [-2], colors='#9BCA7E')
+
     # annotate lines
-    for d, l, r in zip(vals+[benchmark_value], levels + [2], names +['Building EC (' + str(round(benchmark_value)) + ')']):
+    for d, l, r in zip(vals+[benchmark_value, suggested_benchmark_value], levels + [2, -2], names + [
+        'Current Building EC (' + str(round(benchmark_value)) + ')',
+        'Suggested Building EC (' + str(round(suggested_benchmark_value)) + ')'
+    ]):
         ax.annotate(r, xy=(d, l),
                     xytext=(-3, np.sign(l) * 3), textcoords="offset points",
                     horizontalalignment="right",
@@ -99,12 +108,8 @@ def get_git_id():
     return git_id
 
 
-def zip_sort(list1, list2):
-    zipped_lists = zip(list2, list1)
-    sorted_pairs = sorted(zipped_lists, reverse=True)
-    tuples = zip(*sorted_pairs)
-    list2, list1 = [list(t) for t in tuples]
-    return (list1, list2)
+def zip_sort(*args):
+    return zip(*sorted(zip(*args), reverse=True, key= lambda t: t[-1]))
 
 #
 # Report Generation
@@ -549,9 +554,10 @@ if __name__ == '__main__':
                           quantities['Volume']
         # print('  ', 'embodied_carbon', embodied_carbon, 'kgCO2')
         element_counts['Door']['Carbon'] += embodied_carbon
+        composite_layer = 'External Door Composite' if door_properties['IsExternal'] else 'Internal Door Composite'
         element_dict['Door'][door.Name + ' (' + door.GlobalId + ')'] = {
             'IsExternal' : door_properties['IsExternal'],
-            'Layers': {'Door Composite': embodied_carbon}
+            'Layers': {composite_layer: embodied_carbon}
         }
 
     print('Processing Windows/Skylights...')
@@ -622,14 +628,14 @@ if __name__ == '__main__':
         for sub_key, sub_val in element_val.items():
             for material_key, material_value in sub_val['Layers'].items():
                 if material_key in material_counts:
-                    material_counts[material_key.strip().title()] += material_value
+                    material_counts[material_key.strip()] += material_value
                 else:
-                    material_counts[material_key.strip().title()] = material_value
+                    material_counts[material_key.strip()] = material_value
 
                 if sub_val['IsExternal']:
-                    element_key_name = 'External' + element_key.strip().title()
+                    element_key_name = 'External' + element_key.strip()
                 else:
-                    element_key_name = element_key.strip().title()
+                    element_key_name = element_key.strip()
                 if element_key_name in element_counts:
                     element_counts[element_key_name] += material_value
                 else:
@@ -643,10 +649,9 @@ if __name__ == '__main__':
     print('Processing Replacements...')
     cmp_tol = 1e-5 # Tolerance when comparing floats
     ec_dataframe = pd.read_csv('EC_MaterialsDB.csv',sep=';')
-    ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: str(x).strip().title())
+    ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: str(x).strip())
 
     # Parse EC Code
-    print(ec_dataframe)
     ec_dataframe['EC_Class'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[1])
     ec_dataframe['EC_ID'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[2])
 
@@ -657,26 +662,28 @@ if __name__ == '__main__':
     ec_replacements_dict = {}
     min_ec_dict = {}
     for material in material_counts.keys():
-        min_ec_dict[material.strip().title()] = 0.
-        material_dataframe =  ec_dataframe.loc[ec_dataframe['Name'] == material.strip().title()]
+        min_ec_dict[material.strip()] = 0.
+        material_dataframe =  ec_dataframe.loc[ec_dataframe['Name'] == material.strip()]
         if len(material_dataframe) > 1:
-            raise LookupError('Found more than one entry in database for: ' + material.strip().title() )
+            raise LookupError('Found more than one entry in database for: ' + material.strip() )
+        elif len(material_dataframe) == 0:
+            print('WARNING: did not find material %s in database' % material.strip())
         elif len(material_dataframe) == 1:
             #print(material_dataframe)
             # Attempt to find replacement material
             #print('EC_Class', material_dataframe.squeeze().at['EC_Class'])
             class_dataframe = ec_dataframe.loc[ec_dataframe['EC_Class'] == material_dataframe.squeeze().at['EC_Class']]
             if class_dataframe.EC_Per_Volume.min() < material_dataframe.squeeze().at['EC_Per_Volume'] - cmp_tol:
-                min_ec_dict[material.strip().title()] = class_dataframe.EC_Per_Volume.min()
+                min_ec_dict[material.strip()] = class_dataframe.EC_Per_Volume.min()
                 possible_replacements = class_dataframe[class_dataframe.EC_Per_Volume == class_dataframe.EC_Per_Volume.min()]
                 if len(possible_replacements) > 0:
                     ec_replacements_dict[material_dataframe.squeeze().at['Name']] = pd.concat([
                             material_dataframe[['ID','Name','EC_Per_Volume']],
                             possible_replacements[['ID','Name','EC_Per_Volume']]
                         ])
-
-    # Plot 1
-    plot_benchmark(os.path.join('reports',ifc_filename,'benchmark'), building_ec/building_area_internal)
+            else:
+                #min_ec_dict[material.strip()] = material_dataframe.squeeze().at['EC_Per_Volume']
+                min_ec_dict[material.strip()] = 0.
 
     # Plot 2
     names = list(material_counts.keys())
@@ -684,28 +691,38 @@ if __name__ == '__main__':
     names, values = zip_sort(names, values)
     #for name in names:
     #    print(name)
-    #    print(ec_dataframe.loc[ec_dataframe['Name'] == name.strip().title()].squeeze() == None)
+    #    print(ec_dataframe.loc[ec_dataframe['Name'] == name.strip()].squeeze() == None)
     plot_min_values = []
-    true_min_values_dict = {}
+    true_min_values = []
+    true_saving_values = []
     for name, value in zip(names, values):
-        if not ec_dataframe.loc[ec_dataframe['Name'] == name.strip().title()].squeeze().empty:
+        if not ec_dataframe.loc[ec_dataframe['Name'] == name.strip()].squeeze().empty:
             new_ec = value * min_ec_dict[name] / float(ec_dataframe.loc[ec_dataframe['Name'] == name].squeeze().at['EC_Per_Volume'])
             plot_min_values.append(new_ec)
-            true_min_values_dict[name] = new_ec
+            true_min_values.append(new_ec)
+            true_saving_values.append(value - new_ec)
         else:
-            plot_min_values.append(material_counts[name])
-            true_min_values_dict[name] = material_counts[name]
+            plot_min_values.append(0.) # if no suggestion, do not plot a suggested bar
+            true_min_values.append(material_counts[name])
+            true_saving_values.append(0.)
     plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO₂', plot_min_values)
 
     # Replacement Tables
+    names, values, true_min_values, true_saving_values = zip_sort(names, values, true_min_values, true_saving_values)
+    true_min_values_dict = {names[i]: true_min_values[i] for i in range(len(names))}
+    true_saving_values_dict = {names[i]: true_saving_values[i] for i in range(len(names))}
     ec_replacements_str = []
     i = 1
     for name in names:
         if name in ec_replacements_dict:
             ec_replacements_str.append(
-                '\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#9BCA7E">%.0f kgCO₂</span>  \n' % (
-                i, name, material_counts[name], true_min_values_dict[name]))
-            ec_replacements_str.append(ec_replacements_dict[name].to_markdown(index=False))
+                '\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#9BCA7E">%.0f kgCO₂</span> (Saving %.0f kgCO₂)  \n' % (
+                i, name, material_counts[name], true_min_values_dict[name], true_saving_values_dict[name]))
+            ec_replacements_str.append(ec_replacements_dict[name].to_markdown(
+                index=False,
+                headers=['ID','Name','EC/m³'],
+                floatfmt='.2f')
+            )
             i = i + 1
     ec_replacements_str = '\n'.join(ec_replacements_str)
 
@@ -733,9 +750,13 @@ if __name__ == '__main__':
     replacement_dict['GitID'] = get_git_id()[:7]
     replacement_dict['ECReplacements'] = ec_replacements_str
     replacement_dict['BuildingPotentialEC'] = sum(true_min_values_dict.values())
+    replacement_dict['BuildingPotentialECPerAreaInternal'] = replacement_dict['BuildingPotentialEC'] / building_area_internal
     replacement_dict.update(building_properties)
 
     generate_report(ifc_filename, replacement_dict)
+
+    # Plot 1
+    plot_benchmark(os.path.join('reports',ifc_filename,'benchmark'), building_ec/building_area_internal, replacement_dict['BuildingPotentialECPerAreaInternal'])
 
     # TODO, carbon per Slab/Window etc
     # TODO, carbon per material

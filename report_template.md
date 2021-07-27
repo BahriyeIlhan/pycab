@@ -11,12 +11,13 @@
 
 ## Embodied Carbon Overview
 
-| Description                       | Value                                     |
-| :-----------------------------    | :---------------------------------------- |
-| Internal Building Area            | %(BuildingAreaInternal)20.2f m²           |
-| Total Embodied Carbon     [A1-A3] | %(BuildingEC)20.2f kgCO₂                  |
-| Total Embodied Carbon/m²          | %(BuildingECPerAreaInternal)20.2f kgCO₂/m²|
-| Potential Embodied Carbon [A1-A3] | %(BuildingPotentialEC)20.2f kgCO₂                  |
+| Description                          | Value                                               |
+| :-----------------------------       | :-------------------------------------------------- |
+| Internal Building Area               | %(BuildingAreaInternal)20.2f m²                     |
+| Total Embodied Carbon     [A1-A3]    | %(BuildingEC)20.2f kgCO₂                            |
+| Total Embodied Carbon/m²             | %(BuildingECPerAreaInternal)20.2f kgCO₂/m²          |
+| Potential Embodied Carbon [A1-A3]    | %(BuildingPotentialEC)20.2f kgCO₂                   |
+| Potential Embodied Carbon/m² [A1-A3] | %(BuildingPotentialECPerAreaInternal)20.2f kgCO₂/m² |
 
 ### Benchmark [¹][riba2030]
 
