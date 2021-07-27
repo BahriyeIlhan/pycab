@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 import markdown
 import matplotlib.pyplot as plt
-import seaborn as sns
 import ifcopenshell
 #import ifcopenshell.geom
 #import ifcopenshell.util.pset
@@ -702,9 +701,11 @@ if __name__ == '__main__':
     i = 1
     for name in names:
         if name in ec_replacements_dict:
-            ec_replacements_str.append('\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#C5E0B4">%.0f kgCO₂</span>  \n' % (i, name, material_counts[name], true_min_values_dict[name]) )
+            ec_replacements_str.append(
+                '\n#### %d. %s: <span style="color:#4C7998">%.0f kgCO₂</span> / <span style="color:#C5E0B4">%.0f kgCO₂</span>  \n' % (
+                i, name, material_counts[name], true_min_values_dict[name]))
             ec_replacements_str.append(ec_replacements_dict[name].to_markdown(index=False))
-            i = i+1
+            i = i + 1
     ec_replacements_str = '\n'.join(ec_replacements_str)
 
     # Plot 3
@@ -725,6 +726,7 @@ if __name__ == '__main__':
     new_names, values = zip_sort(new_names, values)
     plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO₂')
 
+    # Generate Report
     replacement_dict = {}
     replacement_dict['Date'] = datetime.date.today().strftime("%d/%m/%Y")
     replacement_dict['GitID'] = get_git_id()[:7]
