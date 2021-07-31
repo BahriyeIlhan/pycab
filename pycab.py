@@ -371,7 +371,6 @@ def get_building_properties(building):
 
 
 if __name__ == '__main__':
-    # Workflow from https://thinkmoult.com/using-ifcopenshell-parse-ifc-files-python.html
 
     ifc_filename = 'EC_Project_SR'
 
@@ -380,26 +379,6 @@ if __name__ == '__main__':
 
     # Parse file
     ifc_file = ifcopenshell.open(os.path.join('examples', ifc_filename + '.ifc'))
-
-    # # Specify to return pythonOCC shapes from ifcopenshell.geom.create_shape()
-    # settings = ifcopenshell.geom.settings()
-    # settings.set(settings.USE_PYTHON_OPENCASCADE, True)
-    #
-    # # Initialize a graphical display window
-    # occ_display = ifcopenshell.geom.utils.initialize_display()
-    #
-    # # Open the IFC file using IfcOpenShell
-    # # Display the geometrical contents of the file using Python OpenCascade
-    # products = ifc_file.by_type("IfcProduct")
-    # for product in products:
-    #     if product.is_a("IfcOpeningElement"): continue
-    #     if product.Representation:
-    #         shape = ifcopenshell.geom.create_shape(settings, product).geometry
-    #         display_shape = ifcopenshell.geom.utils.display_shape(shape)
-    #         if product.is_a("IfcPlate"):
-    #             # Plates are the transparent parts of the window assembly
-    #             # in the IfcOpenHouse model
-    #             ifcopenshell.geom.utils.set_shape_transparency(display_shape, 0.8)
 
     area_type_dictionary = {
         'Wall': 'NetSideArea',
@@ -438,7 +417,6 @@ if __name__ == '__main__':
     print('Processing Walls...')
     walls = ifc_file.by_type('IfcWall')
     for wall in walls:
-        #print('* ', wall.Name)
         element_counts['Wall']['Number'] += 1
 
         quantities = get_extent(wall)
@@ -456,35 +434,20 @@ if __name__ == '__main__':
                                  embodied_carbon * \
                                  mass_density
             total_wall_carbon += total_layer_carbon
-
-            # print('     ', str(material_layer['Name']), material_layer['LayerThickness'], material_properties[material_layer['Name']]['EmbodiedCarbon'], material_properties[material_layer['Name']]['MassDensity'] )
-            # print('      ', total_layer_carbon)
-            # print('NetSideArea',quantities['NetSideArea'])
-            # print('Length',quantities['Length'])
-            # print('Height',quantities['Height'])
-            # print('     ', str(material_layer.Material.Name), ' = ', total_layer_carbon, material_layer.LayerThickness, material_properties[material_layer.Material.Name]['EmbodiedCarbon'], material_properties[material_layer.Material.Name]['MassDensity'] )
             if material_layer['Name'] in material_layer_dict:
                 material_layer_dict[material_layer['Name']] += total_layer_carbon
             else:
                 material_layer_dict[material_layer['Name']] = total_layer_carbon
-
         element_dict['Wall'][wall.Name + ' (' + wall.GlobalId + ')'] = {
             'IsExternal': material_properties['IsExternal'],
             'Area': quantities['NetSideArea'],
             'Layers': material_layer_dict
         }
-
-        # print('  ','total_wall_carbon',total_wall_carbon,'kgCO2')
         element_counts['Wall']['Carbon'] += total_wall_carbon
-
-    #print('expected', element_counts['Wall']['Carbon'])
-    #get_totals(element_dict)
-    #exit()
 
     print('Processing Slabs/Roofs...')
     slabs = ifc_file.by_type('IfcSlab')
     for slab in slabs:
-        #print('* ', slab.Name)
         if get_element_type(slab) == 'ROOF':
             element_counts['Roof']['Number'] += 1
         else:
@@ -502,29 +465,21 @@ if __name__ == '__main__':
             if material_layer['Name'] in material_properties:
                 embodied_carbon = material_properties[material_layer['Name']]['EmbodiedCarbon']
                 mass_density = material_properties[material_layer['Name']]['MassDensity']
-                # print('    ', material_layer['Name'], embodied_carbon, mass_density, material_layer['LayerThickness'])
             else:
                 embodied_carbon = material_properties[material_names[material_layer['Name']]]['EmbodiedCarbon']
                 mass_density = material_properties[material_names[material_layer['Name']]]['MassDensity']
-                # print('    ', material_names[material_layer['Name']], embodied_carbon, mass_density, material_layer['LayerThickness'])
 
             # Assuming thickness in mm, areas in m^2, embodied_carbon in kgCO2/kg, mass_density in kg/m^3
             total_layer_carbon = material_layer['LayerThickness'] / 1000. * \
                                  quantities['NetArea'] * \
                                  embodied_carbon * \
                                  mass_density
-            # print('      ', total_layer_carbon)
-            # print('NetArea',quantities['NetArea'])
-            # print('     ', str(material_layer.Material.Name), ' = ', total_layer_carbon, material_layer.LayerThickness, material_properties[material_layer.Material.Name]['EmbodiedCarbon'], material_properties[material_layer.Material.Name]['MassDensity'] )
             total_slab_carbon += total_layer_carbon
-
-            #print(material_layer['Name'])
             if material_layer['Name'] in material_properties:
                 material_layer_dict[material_layer['Name']] = total_layer_carbon
             else:
                 material_layer_dict[material_names[material_layer['Name']]] = total_layer_carbon
 
-        # print('  ','total_slab_carbon',total_slab_carbon,'kgCO2')
         if get_element_type(slab) == 'ROOF':
             element_counts['Roof']['Carbon'] += total_slab_carbon
             element_dict['Roof'][slab.Name + ' (' + slab.GlobalId + ')'] = {
@@ -543,8 +498,6 @@ if __name__ == '__main__':
     print('Processing Doors...')
     doors = ifc_file.by_type('IfcDoor')
     for door in doors:
-        #print('* ', door.Name)
-
         element_counts['Door']['Number'] += 1
         quantities = get_extent(door)
         door_properties = get_element_properties(door)
@@ -552,7 +505,6 @@ if __name__ == '__main__':
         # Assuming volumne in m^3, embodied_carbon in kgCO2/kg, mass_density in kg/m^3
         embodied_carbon = door_properties['Element']['EmbodiedCarbon'] * door_properties['Element']['MassDensity'] * \
                           quantities['Volume']
-        # print('  ', 'embodied_carbon', embodied_carbon, 'kgCO2')
         element_counts['Door']['Carbon'] += embodied_carbon
         composite_layer = 'External Door Composite' if door_properties['IsExternal'] else 'Internal Door Composite'
         element_dict['Door'][door.Name + ' (' + door.GlobalId + ')'] = {
@@ -563,14 +515,13 @@ if __name__ == '__main__':
     print('Processing Windows/Skylights...')
     windows = ifc_file.by_type('IfcWindow')
     for window in windows:
-        #print('* ', window.Name)
         element_counts['Window']['Number'] += 1
         quantities = get_extent(window)
         window_properties = get_element_properties(window)
+
         # Assuming volumne in m^3, embodied_carbon in kgCO2/kg, mass_density in kg/m^3
         embodied_carbon = window_properties['Element']['EmbodiedCarbon'] * window_properties['Element']['MassDensity'] * \
                           quantities['Volume']
-        # print('  ', 'embodied_carbon', embodied_carbon, 'kgCO2')
         element_counts['Window']['Carbon'] += embodied_carbon
         element_dict['Window'][window.Name + ' (' + window.GlobalId + ')'] = {
             'IsExternal': window_properties['IsExternal'],
@@ -580,10 +531,10 @@ if __name__ == '__main__':
     print('Processing Stairs...')
     stairs = ifc_file.by_type('IfcStair')
     for stair in stairs:
-        #print('* ', stair.Name)
         element_counts['Stair']['Number'] += 1
         quantities = get_extent(stair)
         stair_properties = get_element_properties(stair)
+
         # Assuming volumne in m^3, embodied_carbon in kgCO2/kg, mass_density in kg/m^3
         embodied_carbon = stair_properties['Element']['EmbodiedCarbon'] * stair_properties['Element']['MassDensity'] * \
                           quantities['NetVolume']
@@ -594,84 +545,38 @@ if __name__ == '__main__':
             'Layers': {'Stair Composite': embodied_carbon}
         }
 
-    #print(element_counts)
-
-    # Total Carbon
-    #total_carbon = 0
-    #for val in element_counts.values():
-    #    total_carbon += val['Carbon']
-    #print('total_carbon', total_carbon, 'kgC02')
-
-    # Total Floor space
-    #print(element_dict)
-    #total_area = 0
-    #for key, value in element_dict['Slab'].items():
-    #    total_area += value['Area']
-    #print('total_area', total_area, 'm2')
-
-    #print('total_carbon/total_area', total_carbon / total_area, 'kgCO2/m2')
-
-    # Parse Elements
-    #names = list(element_counts.keys())
-    #values = list(element_counts[name]['Carbon'] for name in names)
-    #names, values = zip_sort(names, values)
-    #plot_barchart(names, values, 'Total kgCO2')
-
-    element_counts = {}
-    material_counts = {}
-    building_area_internal = 0
-    for element_key, element_val in element_dict.items():
-        if element_key == 'Slab':
-            for sub_key, sub_val in element_val.items():
-                if not sub_val['IsExternal']:
-                    building_area_internal += sub_val['Area']
-        for sub_key, sub_val in element_val.items():
-            for material_key, material_value in sub_val['Layers'].items():
-                if material_key in material_counts:
-                    material_counts[material_key.strip()] += material_value
-                else:
-                    material_counts[material_key.strip()] = material_value
-
-                if sub_val['IsExternal']:
-                    element_key_name = 'External' + element_key.strip()
-                else:
-                    element_key_name = element_key.strip()
-                if element_key_name in element_counts:
-                    element_counts[element_key_name] += material_value
-                else:
-                    element_counts[element_key_name] = material_value
-    building_ec = sum(element_counts.values())
-    building_properties['BuildingAreaInternal'] = building_area_internal
-    building_properties['BuildingEC'] = building_ec
-    building_properties['BuildingECPerAreaInternal'] = building_ec/building_area_internal
-    building_properties['IFCFilename'] = ifc_filename
-
+    #
+    # Find Replacements
+    #
     print('Processing Replacements...')
+
+    # get list of materials
+    material_list = set()
+    for element_key, element_val in element_dict.items():
+        for sub_key, sub_val in element_val.items():
+            for material_key in sub_val['Layers'].keys():
+                material_list.add(material_key)
+    material_list = list(material_list)
+
+    # process replacement database
     cmp_tol = 1e-5 # Tolerance when comparing floats
     ec_dataframe = pd.read_csv('EC_MaterialsDB.csv',sep=';')
     ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: str(x).strip())
-
-    # Parse EC Code
     ec_dataframe['EC_Class'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[1])
     ec_dataframe['EC_ID'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[2])
-
-    # Compute EC Per Volume
     ec_dataframe['EC_Per_Volume'] = ec_dataframe['EmbodiedCarbon(kgCO2e/kg)'].apply(lambda x: float(str(x).replace(',','.'))) * \
                                     ec_dataframe['Density'].apply(lambda x: float(str(x).replace(',','.')))
-
+    # build replacement dict
     ec_replacements_dict = {}
     min_ec_dict = {}
-    for material in material_counts.keys():
-        min_ec_dict[material.strip()] = 0.
+    for material in material_list:
         material_dataframe =  ec_dataframe.loc[ec_dataframe['Name'] == material.strip()]
         if len(material_dataframe) > 1:
             raise LookupError('Found more than one entry in database for: ' + material.strip() )
         elif len(material_dataframe) == 0:
             print('WARNING: did not find material %s in database' % material.strip())
         elif len(material_dataframe) == 1:
-            #print(material_dataframe)
             # Attempt to find replacement material
-            #print('EC_Class', material_dataframe.squeeze().at['EC_Class'])
             class_dataframe = ec_dataframe.loc[ec_dataframe['EC_Class'] == material_dataframe.squeeze().at['EC_Class']]
             if class_dataframe.EC_Per_Volume.min() < material_dataframe.squeeze().at['EC_Per_Volume'] - cmp_tol:
                 min_ec_dict[material.strip()] = class_dataframe.EC_Per_Volume.min()
@@ -682,33 +587,86 @@ if __name__ == '__main__':
                             possible_replacements[['ID','Name','EC_Per_Volume']]
                         ])
             else:
-                #min_ec_dict[material.strip()] = material_dataframe.squeeze().at['EC_Per_Volume']
-                min_ec_dict[material.strip()] = 0.
+                min_ec_dict[material.strip()] = material_dataframe.squeeze().at['EC_Per_Volume']
 
-    # Plot 2
-    names = list(material_counts.keys())
-    values = [material_counts[name] for name in names]
-    names, values = zip_sort(names, values)
-    #for name in names:
-    #    print(name)
-    #    print(ec_dataframe.loc[ec_dataframe['Name'] == name.strip()].squeeze() == None)
+    building_area_internal = 0
+    material_counts = {}
+    element_counts = {}
+    for element_key, element_val in element_dict.items():
+        if element_key == 'Slab':
+            for sub_key, sub_val in element_val.items():
+                if not sub_val['IsExternal']:
+                    building_area_internal += sub_val['Area']
+        for sub_key, sub_val in element_val.items():
+            for material_key, material_value in sub_val['Layers'].items():
+                # build current material counts
+                if material_key in material_counts:
+                    material_counts[material_key.strip()] += material_value
+                else:
+                    material_counts[material_key.strip()] = material_value
+                # build current element counts
+                if sub_val['IsExternal']:
+                    element_key_name = 'External' + element_key.strip()
+                else:
+                    element_key_name = element_key.strip()
+                if element_key_name in element_counts:
+                    element_counts[element_key_name] += material_value
+                else:
+                    element_counts[element_key_name] = material_value
+
+    # build min material counts
+    min_material_counts = {}
+    for material in material_list:
+        material_key = material.strip()
+        if not ec_dataframe.loc[ec_dataframe['Name'] == material_key].squeeze().empty:
+            new_ec = material_counts[material_key] * min_ec_dict[material_key] / float(
+                ec_dataframe.loc[ec_dataframe['Name'] == material_key].squeeze().at['EC_Per_Volume'])
+            min_material_counts[material_key] = new_ec
+        else:
+            min_material_counts[material_key] = material_counts[material_key] # current == suggested
+
+    # build min element counts
+    min_element_counts = {}
+    for element_key, element_val in element_dict.items():
+        for sub_key, sub_val in element_val.items():
+            for material_key, material_value in sub_val['Layers'].items():
+                if not ec_dataframe.loc[ec_dataframe['Name'] == material_key.strip()].squeeze().empty:
+                    new_ec = material_value * min_ec_dict[material_key.strip()] / float(
+                        ec_dataframe.loc[ec_dataframe['Name'] == material_key.strip()].squeeze().at['EC_Per_Volume'])
+                else:
+                    new_ec = material_value
+                if sub_val['IsExternal']:
+                    element_key_name = 'External' + element_key.strip()
+                else:
+                    element_key_name = element_key.strip()
+                if element_key_name in min_element_counts:
+                    min_element_counts[element_key_name] += new_ec
+                else:
+                    min_element_counts[element_key_name] = new_ec
+
+
+    sorted_material_names = list(material_counts.keys())
+    sorted_material_values = [material_counts[sorted_material_names] for sorted_material_names in sorted_material_names]
+    sorted_material_names, sorted_material_values = zip_sort(sorted_material_names, sorted_material_values)
     plot_min_values = []
     true_min_values = []
     true_saving_values = []
-    for name, value in zip(names, values):
+    for name, value in zip(sorted_material_names, sorted_material_values):
         if not ec_dataframe.loc[ec_dataframe['Name'] == name.strip()].squeeze().empty:
             new_ec = value * min_ec_dict[name] / float(ec_dataframe.loc[ec_dataframe['Name'] == name].squeeze().at['EC_Per_Volume'])
             plot_min_values.append(new_ec)
             true_min_values.append(new_ec)
             true_saving_values.append(value - new_ec)
         else:
-            plot_min_values.append(0.) # if no suggestion, do not plot a suggested bar
+            plot_min_values.append(material_counts[name]) # if no suggestion, do not plot a suggested bar
             true_min_values.append(material_counts[name])
             true_saving_values.append(0.)
-    plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), names, values, 'Total kgCO₂', plot_min_values)
+
+    # Plot 2
+    plot_barchart(os.path.join('reports',ifc_filename,'material_counts'), sorted_material_names, sorted_material_values, 'Total kgCO₂', plot_min_values)
 
     # Replacement Tables
-    names, values, true_min_values, true_saving_values = zip_sort(names, values, true_min_values, true_saving_values)
+    names, values, true_min_values, true_saving_values = zip_sort(sorted_material_names, sorted_material_values, true_min_values, true_saving_values)
     true_min_values_dict = {names[i]: true_min_values[i] for i in range(len(names))}
     true_saving_values_dict = {names[i]: true_saving_values[i] for i in range(len(names))}
     ec_replacements_str = []
@@ -740,24 +698,28 @@ if __name__ == '__main__':
     }
     names = list(element_counts.keys())
     values = list(element_counts[name] for name in names)
+    min_values = list(min_element_counts[name] for name in names)
     new_names = [element_rename_dict[n] for n in names]
-    new_names, values = zip_sort(new_names, values)
-    plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO₂')
+    new_names, values, min_values = zip_sort(new_names, values, min_values)
+    plot_barchart(os.path.join('reports',ifc_filename,'element_counts'), new_names, values, 'Total kgCO₂', min_values)
 
     # Generate Report
+    building_ec = sum(element_counts.values())
     replacement_dict = {}
     replacement_dict['Date'] = datetime.date.today().strftime("%d/%m/%Y")
     replacement_dict['GitID'] = get_git_id()[:7]
     replacement_dict['ECReplacements'] = ec_replacements_str
     replacement_dict['BuildingPotentialEC'] = sum(true_min_values_dict.values())
-    replacement_dict['BuildingPotentialECPerAreaInternal'] = replacement_dict['BuildingPotentialEC'] / building_area_internal
+    replacement_dict['BuildingPotentialECPerAreaInternal'] = sum(true_min_values_dict.values()) / building_area_internal
+    replacement_dict['BuildingAreaInternal'] = building_area_internal
+    replacement_dict['BuildingEC'] = building_ec
+    replacement_dict['BuildingECPerAreaInternal'] = building_ec/building_area_internal
+    replacement_dict['IFCFilename'] = ifc_filename
     replacement_dict.update(building_properties)
-
-    generate_report(ifc_filename, replacement_dict)
 
     # Plot 1
     plot_benchmark(os.path.join('reports',ifc_filename,'benchmark'), building_ec/building_area_internal, replacement_dict['BuildingPotentialECPerAreaInternal'])
 
-    # TODO, carbon per Slab/Window etc
-    # TODO, carbon per material
+    generate_report(ifc_filename, replacement_dict)
+
     # TODO, compare with Leti guide and recompute with new materials (for Bahriye)
