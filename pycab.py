@@ -49,7 +49,7 @@ def plot_benchmark(filename, benchmark_value, suggested_benchmark_value):
     # Choose some nice levels
     levels = [-3, -2, -2, -3, -2, -2, -3, 3, 2, 3, 2, 3]
     colors = ['#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD','#F8CBAD',
-              '#C5E0B4','#C5E0B4','#C5E0B4','#C5E0B4','#C5E0B4']
+              '#93DBDB','#93DBDB','#93DBDB','#93DBDB','#93DBDB']
 
     # Create figure and plot a stem plot with the date
     fig, ax = plt.subplots(figsize=(7.5, 4), constrained_layout=True)
