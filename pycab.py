@@ -26,9 +26,9 @@ def plot_barchart(filename, names, values, yaxis, values2 = None):
     plt.ylabel(yaxis)
     plt.xticks(rotation=90)
     # plt.xlabel
-    plt.bar(names, values, color='#4C7998', label='Current')
+    plt.bar(names, values, color='#4C7998', label='Current', edgecolor='#4C7998')
     if values2:
-        plt.bar(names, values2, color='#C5E0B4', label='Suggested')
+        plt.bar(names, values2, color='#C5E0B4', label='Potential', edgecolor='#4C7998')
 
     ax.text(0.95, 0.95, 'pycab', ha='center', va='center', transform=ax.transAxes, font='Andale Mono', fontsize=12, color='grey')
     plt.legend(loc='upper right', bbox_to_anchor=(1., 0.9))
@@ -69,7 +69,7 @@ def plot_benchmark(filename, benchmark_value, suggested_benchmark_value):
     # annotate lines
     for d, l, r in zip(vals+[benchmark_value, suggested_benchmark_value], levels + [2, -2], names + [
         'Current Building EC (' + str(round(benchmark_value)) + ')',
-        'Suggested Building EC (' + str(round(suggested_benchmark_value)) + ')'
+        'Potential Building EC (' + str(round(suggested_benchmark_value)) + ')'
     ]):
         ax.annotate(r, xy=(d, l),
                     xytext=(-3, np.sign(l) * 3), textcoords="offset points",
