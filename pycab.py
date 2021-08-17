@@ -2,6 +2,7 @@
 import os
 import shutil
 import datetime
+import argparse
 from subprocess import check_output as shell_call, CalledProcessError, STDOUT
 
 import pandas as pd
@@ -372,13 +373,18 @@ def get_building_properties(building):
 
 if __name__ == '__main__':
 
-    ifc_filename = 'EC_Project_SR'
+    parser = argparse.ArgumentParser(description='A python tool for calculating the embodied carbon of IFC files.')
+    parser.add_argument('-i','--ifcfile', action='store', type=str, required=True, help='the IFC file to process', metavar="IFC_FILE")
+    parser.add_argument('-d','--dbfile', action='store', type=str, required=False, help='the material database file', default='EC_MaterialsDB.csv', metavar="DATABASE_FILE")
+    args = parser.parse_args()
+
+    ifc_filename, _ = os.path.splitext(os.path.basename(args.ifcfile))
 
     # Generate report directory
     os.makedirs(os.path.join('reports',ifc_filename), exist_ok=True)
 
     # Parse file
-    ifc_file = ifcopenshell.open(os.path.join('examples', ifc_filename + '.ifc'))
+    ifc_file = ifcopenshell.open(args.ifcfile)
 
     area_type_dictionary = {
         'Wall': 'NetSideArea',
@@ -560,7 +566,7 @@ if __name__ == '__main__':
 
     # process replacement database
     cmp_tol = 1e-5 # Tolerance when comparing floats
-    ec_dataframe = pd.read_csv('EC_MaterialsDB.csv',sep=';')
+    ec_dataframe = pd.read_csv(args.dbfile,sep=';')
     ec_dataframe['Name'] = ec_dataframe['Name'].apply(lambda x: str(x).strip())
     ec_dataframe['EC_Class'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[1])
     ec_dataframe['EC_ID'] = ec_dataframe['ID'].apply(lambda x: str(x).split('-')[2])
