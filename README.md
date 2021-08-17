@@ -20,7 +20,7 @@ pycab is a simple script, no installation is necessary.
 
 Example:
 ```shell
-python3 pycab.py
+python3 pycab.py --ifcfile examples/EC_Project_SR.ifc
 ```
 
 Output:
@@ -32,6 +32,10 @@ Processing Doors...
 Processing Windows/Skylights...
 Processing Stairs...
 Processing Replacements...
+WARNING: did not find material Internal Door Composite in database
+WARNING: did not find material Window Composite in database
+WARNING: did not find material External Door Composite in database
+WARNING: did not find material Stair Composite in database
 ```
 
-The report is written to `reports` directory.
+The report is written to the `reports` directory.
