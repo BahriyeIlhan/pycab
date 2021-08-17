@@ -1,6 +1,6 @@
 # Embodied Carbon Report
 
-**pycab Version**: %(GitID)s  
+**pycab version**: %(GitID)s  
 **Report Generation Date**: %(Date)s  
 
 **Project Filename**: %(IFCFilename)s.ifc  
